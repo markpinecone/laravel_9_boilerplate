@@ -1,0 +1,58 @@
+#!/bin/bash
+#set -x
+
+args="$@"
+container="dev_runner:0.1"
+
+# Color variables
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+# Clear the color after that
+clear='\033[0m'
+
+if ( ! docker version > /dev/null 2>&1); then
+    echo -e "${red}\nDocker not installed!${clear}" >&2
+    exit 2
+fi
+
+if [ -z $1 ]; then                                                                                                                                                                                                                                                             
+    echo -e "${red}\nParameters has to be provided!${clear}" >&2
+    exit 2                                                                                                                                                                                                                                                         
+fi 
+
+
+SHELL_PARAMS=(
+    run --rm --interactive --tty --volume $PWD:/app "${container}" zsh
+)
+
+RUN_PARAMS=(
+    run --rm -it --volume $PWD:/app "${container}" bash -c "$args"
+)
+
+if [ $1 == "build-dev" ]; then                                                                                                                                                                                                                                                             
+        cd _devel/Dockerfiles/dev_runner/ \
+        && docker build -t "${container}" .
+        echo -e "${green}\nDone!${clear}"
+        exit 0
+fi
+
+if [ $1 == "init" ]; then                                                                                                                                                                                                                                                             
+        echo "\nDon't know ..yet"
+        exit 0
+fi
+
+if [ $1 == "shell" ]; then                                                                                                                                                                                                                                                             
+        docker "${SHELL_PARAMS[@]}"
+        exit 0
+fi
+
+if [ $1 == "php" ] || [ $1 == "composer" ]; then                                                                                                                                                                                                                                                          
+        docker "${RUN_PARAMS[@]}"
+        echo -e "${green}\nDone!${clear}"
+        exit 0
+fi
+
+                                                                                                                                                                                                                                                            
+echo -e "${red}\nInvalid Params${clear}" >&2
+exit 2                                                                                                                                                                                                                                                         

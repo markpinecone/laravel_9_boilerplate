@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  #TODO
+  nginx:
+      build: ./_dev/Dockerfiles/Nginx/
+      volumes:
+        - .:/app/
+      ports:
+        - "80:80"
+        - "443:443"
+      networks:
+        - sky_net
+networks:
+  sky_net:
+    driver: bridge

@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+  nginx:
+    build: 
+      context: ./_devel/Dockerfiles/Nginx/
+      target: "dev"
+    volumes:
+      - .:/app/
+    ports:
+      - "3000:80"
+    networks:
+      - sky_net
+  redis:
+    image: "redis:7.0.4"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            retries: 3
+            timeout: 5s
+    networks:
+      - sky_net
+  php-fpm:
+    build: 
+      context: ./_devel/Dockerfiles/PHP-FPM/
+      target: "dev"
+    volumes:
+      - .:/app/
+    networks:
+      - sky_net
+  memcached:
+    image: "memcached:1.6.16"
+    networks:
+      - sky_net
+  mailhog:
+    image: "corpusops/mailhog:latest"
+    networks:
+      - sky_net
+
+networks:
+  sky_net:
+    driver: bridge
